@@ -25,4 +25,5 @@ xgboost
 python-jose[cryptography]
 psycopg2-binary
 asyncpg
+email-validator
 

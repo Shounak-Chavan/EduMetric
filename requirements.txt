@@ -26,4 +26,6 @@ python-jose[cryptography]
 psycopg2-binary
 asyncpg
 email-validator
+pdfplumber
+python-multipart
 

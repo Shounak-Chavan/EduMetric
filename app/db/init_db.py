@@ -5,6 +5,8 @@ from app.db.base import Base
 
 # IMPORTANT: import models so Base knows them
 from app.models.user import User
+from app.models.assignment import Assignment
+from app.models.submission import Submission    
 
 
 async def init_db():

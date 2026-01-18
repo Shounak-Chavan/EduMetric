@@ -6,7 +6,10 @@ from fastapi.security import HTTPBearer
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.api.routers_auth import router as auth_router
+from app.api.routers_assignment import router as assignment_router
+from app.api.routers_assignment_pdf import router as assignment_pdf_router
 from app.db.init_db import init_db
+from app.api.routers_grading import router as grading_router
 
 
 @asynccontextmanager
@@ -22,9 +25,16 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
 # THIS LINE ENABLES AUTHORIZE BUTTON
 app.openapi_schema = None
 security = HTTPBearer()
 
+# -------- ROUTERS --------
 app.include_router(auth_router, tags=["Auth"])
+app.include_router(assignment_router, tags=["Assignments"])
+app.include_router(assignment_pdf_router, tags=["Assignments (PDF)"])
+app.include_router(grading_router, tags=["Grading"])
+
+# -------- EXCEPTIONS --------
 register_exception_handlers(app)

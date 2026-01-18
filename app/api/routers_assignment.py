@@ -47,7 +47,7 @@ async def create_assignment(
 
     # Create Assignment ORM object
     assignment = Assignment(
-        teacher_id=current_user.id,   # logged-in teacher
+        teacher_id = int(current_user["sub"]),   # logged-in teacher
         title=data.title,
         aim_ref=data.aim_ref,
         objectives_ref=data.objectives_ref,
@@ -101,7 +101,7 @@ async def submit_assignment(
     # Create Submission ORM object
     submission = Submission(
         assignment_id=assignment_id,
-        student_id=current_user.id,   # logged-in student
+        student_id=int(current_user["sub"]),   # logged-in student
         aim_ans=data.aim_ans,
         objectives_ans=data.objectives_ans,
         code_ans=data.code_ans,

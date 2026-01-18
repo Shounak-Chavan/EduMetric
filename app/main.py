@@ -10,7 +10,7 @@ from app.api.routers_assignment import router as assignment_router
 from app.api.routers_assignment_pdf import router as assignment_pdf_router
 from app.db.init_db import init_db
 from app.api.routers_grading import router as grading_router
-
+from app.api.routers_submission import router as submission_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +35,7 @@ app.include_router(auth_router, tags=["Auth"])
 app.include_router(assignment_router, tags=["Assignments"])
 app.include_router(assignment_pdf_router, tags=["Assignments (PDF)"])
 app.include_router(grading_router, tags=["Grading"])
+app.include_router(submission_router, tags=["Submissions"])
 
 # -------- EXCEPTIONS --------
 register_exception_handlers(app)

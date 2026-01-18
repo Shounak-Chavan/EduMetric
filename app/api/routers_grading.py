@@ -7,7 +7,7 @@ from app.db.session import get_db
 from app.services.grading_service import grade_submission
 from app.models.submission import Submission
 from app.models.assignment import Assignment
-from app.core.dependencies import require_teacher
+from app.core.rbac import require_teacher
 
 router = APIRouter(
     prefix="/grading",
@@ -27,7 +27,7 @@ async def grade_submission_endpoint(
     # 1️ Fetch assignment (must belong to teacher)
     assignment_stmt = select(Assignment).where(
         Assignment.id == assignment_id,
-        Assignment.teacher_id == teacher.id,
+        Assignment.teacher_id == int(teacher["sub"]),
         Assignment.is_active == True
     )
     assignment_result = await db.execute(assignment_stmt)
@@ -61,7 +61,7 @@ async def grade_submission_endpoint(
         )
 
     # 4️ Grade using service
-    result = grade_submission(submission)
+    result = grade_submission(assignment, submission)
 
     # 5️ Update submission
     submission.marks_obtained = result["marks_obtained"]

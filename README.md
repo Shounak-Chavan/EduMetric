@@ -51,7 +51,7 @@ This project demonstrates **real-world backend engineering** with role-based acc
 
 ### **Backend**
 - **FastAPI** – High-performance async API framework
-- **SQLAlchemy** – ORM for database operations
+- **SQLAlchemy(Async)** – Database operations
 - **PostgreSQL** – Relational database
 - **JWT** – Secure authentication tokens
 - **Ollama (Phi model)** – Local AI for grading

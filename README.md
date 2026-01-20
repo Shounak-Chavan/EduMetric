@@ -47,21 +47,6 @@ This project demonstrates **real-world backend engineering** with role-based acc
 
 ---
 
-## 🧠 Assignment Structure
-
-Each assignment contains 4 sections:
-
-| Section           | Description                          | Default Marks   |
-|------------------|--------------------------------------|-----------------|
-| `Aim`             | Assignment objective/purpose         | 20%             |
-| `Objectives`      | Learning goals and outcomes          | 20%             |
-| `Code`            | Implementation/solution code         | 40%             |
-| `Conclusion`      | Summary and analysis                 | 20%             |
-
-**Total:** Configurable max marks (default: 10)
-
----
-
 ## 🧰 Tech Stack
 
 ### **Backend**
@@ -110,40 +95,10 @@ Register → Login → JWT → Protected Routes → Response
    - Compares student answer vs reference
    - Assigns score (0 to max marks)
    - Generates feedback (1-2 lines)
-4. AI returns JSON: `{ "score": 8.5, "feedback": "..." }`
+4. AI returns Marks and Feedback
 5. Results saved to database
 6. Student sees grade and feedback
-
-**AI Prompt Structure:**
-```
-Section: [Aim/Objectives/Code/Conclusion]
-Reference: [Teacher's answer]
-Student Answer: [Student's submission]
-Max Marks: [Section weight]
-
-→ AI returns JSON with score and feedback
-```
-
----
-
-## 🗄️ Database Schema
-
-### **Users Table**
-- `id`, `email`, `hashed_password`
-- `role` (teacher/student)
-- `is_active`, `created_at`, `updated_at`
-
-### **Assignments Table**
-- `id`, `teacher_id`, `title`
-- `aim_ref`, `objectives_ref`, `code_ref`, `conclusion_ref`
-- `max_marks`, `is_active`
-
-### **Submissions Table**
-- `id`, `assignment_id`, `student_id`
-- `aim_ans`, `objectives_ans`, `code_ans`, `conclusion_ans`
-- `marks_obtained`, `feedback`, `status`
-- `submitted_at`
-
+   
 ---
 
 ## 🚀 Getting Started
@@ -233,7 +188,9 @@ EduMetric/
 │   │   ├── config.py                 # Settings
 │   │   ├── dependencies.py           # Auth dependencies
 │   │   ├── rbac.py                   # Role checks
-│   │   └── security.py               # JWT & password
+│   │   ├── security.py               # JWT & password
+│   │   ├── constants.py               # JWT & password
+│   │   └── exceptions.py             # Exception Handling
 │   ├── db/                    # Database
 │   │   ├── base.py
 │   │   ├── init_db.py
@@ -341,7 +298,6 @@ EduMetric/
 - 🤖 **Multiple AI models** (GPT, Claude, Gemini support)
 - 📈 **Performance monitoring** with Prometheus
 - 🔒 **Rate limiting** for API endpoints
-- 🌐 **i18n** (Internationalization)
 
 ---
 

@@ -33,18 +33,18 @@ async def get_submission_detail(
         )
 
     # 2 STUDENT ACCESS RULE
-    if current_user.role == "student":
-        if submission.student_id != current_user.id:
+    if current_user['role'] == "student":
+        if submission.student_id != int(current_user["sub"]):
             raise HTTPException(
                 status_code=403,
                 detail="Not authorized to view this submission"
             )
 
     # 3 TEACHER ACCESS RULE
-    elif current_user.role == "teacher":
+    elif current_user['role'] == "teacher":
         assignment_stmt = select(Assignment).where(
             Assignment.id == submission.assignment_id,
-            Assignment.teacher_id == current_user.id
+            Assignment.teacher_id == int(current_user["sub"])
         )
         assignment_result = await db.execute(assignment_stmt)
         assignment = assignment_result.scalar_one_or_none()

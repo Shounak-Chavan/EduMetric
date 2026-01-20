@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EduMetric - Grading</title>
+  <link rel="stylesheet" href="css/grading.css">
+</head>
+<body>
+
+  <h2>Grade Submission (Teacher)</h2>
+
+  <input id="assignmentId" placeholder="Assignment ID"><br><br>
+  <input id="submissionId" placeholder="Submission ID"><br><br>
+
+  <button id="gradeBtn">Grade</button>
+
+  <h3>Result</h3>
+  <pre id="resultBox"></pre>
+
+  <button id="viewDetailBtn" style="display:none;">
+    View Submission Detail
+  </button>
+
+  <br><br>
+  <button onclick="window.location.href='dashboard.html'">
+    Back to Dashboard
+  </button>
+
+  <script src="js/grading.js"></script>
+</body>
+</html>

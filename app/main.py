@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from fastapi.security import HTTPBearer
@@ -24,6 +25,15 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
     lifespan=lifespan,
+)
+
+# -------- CORS MIDDLEWARE --------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (restrict in production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 # THIS LINE ENABLES AUTHORIZE BUTTON

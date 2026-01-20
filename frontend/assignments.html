@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EduMetric - Assignments</title>
+  <link rel="stylesheet" href="css/assignments.css">
+</head>
+<body>
+
+  <h2>Assignments</h2>
+
+  <!-- Teacher: Create TEXT Assignment -->
+  <div id="createAssignmentBox">
+    <h3>Create Text Assignment (Teacher)</h3>
+
+    <input id="title" placeholder="Title"><br><br>
+    <textarea id="description" placeholder="Description"></textarea><br><br>
+
+    <button id="createAssignmentBtn">Create Assignment</button>
+    <hr>
+  </div>
+
+  <!-- Teacher: Upload PDF Assignment -->
+  <div id="uploadPdfBox">
+    <h3>Upload Assignment PDF (Teacher)</h3>
+
+    <input type="file" id="pdfFile"><br><br>
+    <button id="uploadPdfBtn">Upload PDF</button>
+    <hr>
+  </div>
+
+  <!-- All: Assignment List -->
+  <h3>All Assignments</h3>
+  <ul id="assignmentsList"></ul>
+
+  <br>
+  <button onclick="window.location.href='dashboard.html'">
+    Back to Dashboard
+  </button>
+
+  <script src="js/assignments.js"></script>
+</body>
+</html>

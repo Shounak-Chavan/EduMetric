@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10-blue?logo=python" />
+  <img src="https://img.shields.io/badge/Python-3.13-blue?logo=python" />
   <img src="https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi" />
   <img src="https://img.shields.io/badge/PostgreSQL-Database-336791?logo=postgresql" />
   <img src="https://img.shields.io/badge/Ollama-AI-000000?logo=ollama" />
@@ -105,7 +105,7 @@ Register → Login → JWT → Protected Routes → Response
 
 ### 1️⃣ Prerequisites
 
-- **Python 3.10+**
+- **Python 3.13+**
 - **PostgreSQL** (local or cloud)
 - **Ollama** with Phi model installed
 
@@ -135,7 +135,7 @@ pip install -r requirements.txt
 
 ### 4️⃣ Configure Environment
 
-Create `.env` file in project root:
+Create `.env` file in project root (not included in repo):
 
 ```env
 # App Config
@@ -155,6 +155,14 @@ DATABASE_URL=postgresql://user:password@localhost:5432/edumetric
 
 ### 5️⃣ Initialize Database
 
+Create the database in PostgreSQL first:
+```bash
+psql -U postgres
+CREATE DATABASE edumetric;
+\q
+```
+
+Then initialize tables:
 ```bash
 python -c "from app.db.init_db import init_db; import asyncio; asyncio.run(init_db())"
 ```
@@ -207,6 +215,7 @@ EduMetric/
 │   │   ├── grading_service.py        # Ollama AI integration
 │   │   ├── pdf_extractor.py          # PDF text extraction
 │   │   └── text_parser.py            # Parse sections
+│   ├── utils/                 # Utility functions
 │   └── main.py                # FastAPI app
 ├── frontend/
 │   ├── css/                   # Stylesheets

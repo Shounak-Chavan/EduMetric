@@ -197,7 +197,7 @@ EduMetric/
 │   │   ├── dependencies.py           # Auth dependencies
 │   │   ├── rbac.py                   # Role checks
 │   │   ├── security.py               # JWT & password
-│   │   ├── constants.py               # JWT & password
+│   │   ├── constants.py              
 │   │   └── exceptions.py             # Exception Handling
 │   ├── db/                    # Database
 │   │   ├── base.py

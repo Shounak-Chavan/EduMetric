@@ -46,7 +46,7 @@ async def create_assignment_from_pdf(
 
     # 4️ Create Assignment DB object
     assignment = Assignment(
-        teacher_id=current_user.id,
+        teacher_id=int(current_user["sub"]),
         title=title,
         aim_ref=sections["aim"],
         objectives_ref=sections["objectives"],
@@ -104,7 +104,7 @@ async def submit_assignment_from_pdf(
     # 4 Create Submission DB object
     submission = Submission(
         assignment_id=assignment_id,
-        student_id=current_user.id,
+        student_id=int(current_user["sub"]),
         aim_ans=sections["aim"],
         objectives_ans=sections["objectives"],
         code_ans=sections["code"],
@@ -120,4 +120,36 @@ async def submit_assignment_from_pdf(
     return {
         "message": "Submission created from PDF",
         "submission_id": submission.id
+    }
+
+
+# STUDENT → EXTRACT PDF FOR PREVIEW (VERIFICATION)
+
+@router.post(
+    "/extract-pdf-preview",
+    status_code=status.HTTP_200_OK,
+)
+async def extract_pdf_for_preview(
+    file: UploadFile = File(...),
+    current_user: User = Depends(require_student),
+):
+    """
+    Student uploads PDF to preview extracted text before submitting.
+    
+    Flow:
+    PDF -> extract text -> parse sections -> return for verification
+    Does NOT save to database.
+    """
+
+    # Extract plain text from PDF
+    raw_text = await extract_text_from_pdf(file)
+
+    # Parse sections
+    sections = parse_sections(raw_text)
+
+    return {
+        "aim_ans": sections["aim"],
+        "objectives_ans": sections["objectives"],
+        "code_ans": sections["code"],
+        "conclusion_ans": sections["conclusion"],
     }

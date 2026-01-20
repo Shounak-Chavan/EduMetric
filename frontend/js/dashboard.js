@@ -1,68 +1,86 @@
-// ---- SESSION HELPERS (inline for now) ----
-function requireAuth() {
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    window.location.href = "login.html";
-  }
-}
-
-function logout() {
-  localStorage.clear();
+// Auth check
+const token = localStorage.getItem("accessToken");
+if (!token) {
   window.location.href = "login.html";
 }
 
-function getCurrentUser() {
-  const user = localStorage.getItem("currentUser");
-  return user ? JSON.parse(user) : null;
-}
-
-// ---- PAGE LOGIC ----
-requireAuth();
-
-const user = getCurrentUser();
-
+const user = JSON.parse(localStorage.getItem("currentUser"));
 if (!user) {
-  logout();
+  window.location.href = "login.html";
 }
 
-// Welcome text
-document.getElementById("welcomeText").innerText =
-  `Welcome ${user.email} (${user.role})`;
+// Display user info
+document.getElementById("userEmail").textContent = user.email;
+document.getElementById("userRole").textContent = user.role.toUpperCase();
+document.getElementById("welcomeText").textContent = `Welcome back, ${user.email}!`;
 
-// ---- Role-based button visibility ----
-if (user.role !== "student") {
-  document.getElementById("submitAssignmentBtn").style.display = "none";
-  document.getElementById("submitPdfBtn").style.display = "none";
+// Show/hide cards based on role
+if (user.role === "student") {
+  document.querySelectorAll(".student-only").forEach(el => el.style.display = "block");
+  document.querySelectorAll(".teacher-only").forEach(el => el.style.display = "none");
+} else if (user.role === "teacher") {
+  document.querySelectorAll(".teacher-only").forEach(el => el.style.display = "block");
+  document.querySelectorAll(".student-only").forEach(el => el.style.display = "none");
 }
 
-if (user.role !== "teacher") {
-  document.getElementById("uploadAssignmentPdfBtn").style.display = "none";
-  document.getElementById("gradeSubmissionsBtn").style.display = "none";
-}
-
-// ---- Navigation (REAL redirects now) ----
-document.getElementById("viewAssignmentsBtn").onclick = () => {
+// Button handlers
+document.getElementById("viewAssignmentsCard").querySelector("button").onclick = () => {
   window.location.href = "assignments.html";
 };
 
-document.getElementById("submitAssignmentBtn").onclick = () => {
-  window.location.href = "submissions.html";
-};
+// Student actions
+const submitTextCard = document.getElementById("submitTextCard");
+if (submitTextCard) {
+  submitTextCard.querySelector("button").onclick = () => {
+    window.location.href = "submit.html";
+  };
+}
 
-document.getElementById("submitPdfBtn").onclick = () => {
-  window.location.href = "submissions_pdf.html";
-};
+const submitPdfCard = document.getElementById("submitPdfCard");
+if (submitPdfCard) {
+  submitPdfCard.querySelector("button").onclick = () => {
+    window.location.href = "submit-pdf.html";
+  };
+}
 
-document.getElementById("uploadAssignmentPdfBtn").onclick = () => {
-  window.location.href = "assignments.html";
-};
+const mySubmissionsCard = document.getElementById("mySubmissionsCard");
+if (mySubmissionsCard) {
+  mySubmissionsCard.querySelector("button").onclick = () => {
+    window.location.href = "my-submissions.html";
+  };
+}
 
-document.getElementById("gradeSubmissionsBtn").onclick = () => {
-  window.location.href = "grading.html";
-};
+// Teacher actions
+const createAssignmentCard = document.getElementById("createAssignmentCard");
+if (createAssignmentCard) {
+  createAssignmentCard.querySelector("button").onclick = () => {
+    window.location.href = "create-assignment.html";
+  };
+}
 
-document.getElementById("viewSubmissionDetailBtn").onclick = () => {
-  window.location.href = "submission_detail.html";
-};
+const uploadPdfCard = document.getElementById("uploadPdfCard");
+if (uploadPdfCard) {
+  uploadPdfCard.querySelector("button").onclick = () => {
+    window.location.href = "upload-pdf.html";
+  };
+}
 
-document.getElementById("logoutBtn").onclick = logout;
+const viewSubmissionsCard = document.getElementById("viewSubmissionsCard");
+if (viewSubmissionsCard) {
+  viewSubmissionsCard.querySelector("button").onclick = () => {
+    window.location.href = "view-submissions.html";
+  };
+}
+
+const gradeCard = document.getElementById("gradeCard");
+if (gradeCard) {
+  gradeCard.querySelector("button").onclick = () => {
+    window.location.href = "grading.html";
+  };
+}
+
+// Logout
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.clear();
+  window.location.href = "login.html";
+};

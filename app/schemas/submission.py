@@ -10,8 +10,6 @@ class SubmissionCreate(BaseModel):
     Used when student submits assignment
     (after PDF/text is already parsed)
     """
-    assignment_id: int
-
     aim_ans: Optional[str] = ""
     objectives_ans: Optional[str] = ""
     code_ans: Optional[str] = ""

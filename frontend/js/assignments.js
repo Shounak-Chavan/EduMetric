@@ -1,131 +1,132 @@
 const API_BASE = "http://localhost:8000";
 
-// ---- Session helpers (inline for now) ----
-function requireAuth() {
-  const token = localStorage.getItem("accessToken");
-  if (!token) window.location.href = "login.html";
-}
-
-function getCurrentUser() {
-  const user = localStorage.getItem("currentUser");
-  return user ? JSON.parse(user) : null;
-}
-
-// ---- Page setup ----
-requireAuth();
-const user = getCurrentUser();
-
+// Auth check
 const token = localStorage.getItem("accessToken");
+if (!token) window.location.href = "login.html";
 
-const createBox = document.getElementById("createAssignmentBox");
-const uploadBox = document.getElementById("uploadPdfBox");
+const user = JSON.parse(localStorage.getItem("currentUser"));
+if (!user) window.location.href = "login.html";
 
-// Role-based UI
-if (user.role !== "teacher") {
-  createBox.style.display = "none";
-  uploadBox.style.display = "none";
+// Logout
+document.getElementById("logoutBtn").onclick = () => {
+  localStorage.clear();
+  window.location.href = "login.html";
+};
+
+// Load assignments
+async function loadAssignments() {
+  document.getElementById("loadingMsg").style.display = "block";
+  document.getElementById("noAssignments").style.display = "none";
+  document.getElementById("assignmentsList").innerHTML = "";
+
+  try {
+    // Endpoint: GET /assignments
+    const response = await fetch(`${API_BASE}/assignments`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    const assignments = await response.json();
+
+    document.getElementById("loadingMsg").style.display = "none";
+
+    // Filter assignments for teachers - show only their own
+    let filteredAssignments = assignments;
+    if (user.role === "teacher") {
+      filteredAssignments = assignments.filter(a => a.teacher_id === parseInt(user.sub));
+    }
+
+    if (filteredAssignments.length === 0) {
+      document.getElementById("noAssignments").style.display = "block";
+      return;
+    }
+
+    displayAssignments(filteredAssignments);
+
+  } catch (error) {
+    document.getElementById("loadingMsg").style.display = "none";
+    console.error(error);
+  }
 }
 
-// ---- Fetch assignments ----
-async function loadAssignments() {
-  const res = await fetch(`${API_BASE}/assignments`, {
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
-
-  const data = await res.json();
-
+function displayAssignments(assignments) {
   const list = document.getElementById("assignmentsList");
   list.innerHTML = "";
 
-  data.forEach(a => {
-    const li = document.createElement("li");
+  assignments.forEach(assignment => {
+    const item = document.createElement("div");
+    item.className = "assignment-item";
 
-    li.innerHTML = `
-      <b>${a.title || "PDF Assignment"}</b><br>
-      ${a.description || ""}<br>
-      <small>ID: ${a.id}</small><br>
+    const header = document.createElement("div");
+    header.className = "assignment-header";
+    header.innerHTML = `
+      <span class="assignment-title">${assignment.title || "Untitled"}</span>
+      <span class="assignment-id">ID: ${assignment.id}</span>
     `;
 
-    // Student: show submit button
+    const content = document.createElement("div");
+    content.className = "assignment-content";
+
     if (user.role === "student") {
-      const btn = document.createElement("button");
-      btn.innerText = "Submit";
-      btn.onclick = () => {
-        localStorage.setItem("selectedAssignmentId", a.id);
-        window.location.href = "submissions.html";
-      };
-      li.appendChild(btn);
+      // Students see only basic info in list view
+      content.innerHTML = `
+        <div class="assignment-meta">
+          <strong>Maximum Marks:</strong> ${assignment.max_marks || "N/A"}
+        </div>
+        <p class="view-hint">Click "View Details" to see full assignment reference</p>
+      `;
+    } else {
+      // Teachers see detailed info about their assignment
+      content.innerHTML = `
+        <div class="assignment-meta">
+          <strong>Maximum Marks:</strong> ${assignment.max_marks || "N/A"}
+        </div>
+        <div class="assignment-meta">
+          <strong>Status:</strong> ${assignment.is_active ? "Active" : "Inactive"}
+        </div>
+      `;
     }
 
-    list.appendChild(li);
+    const actions = document.createElement("div");
+    actions.className = "assignment-actions";
+
+    if (user.role === "student") {
+      const viewBtn = document.createElement("button");
+      viewBtn.className = "btn btn-secondary";
+      viewBtn.textContent = "View Details";
+      viewBtn.onclick = () => {
+        window.location.href = `assignment-detail.html?id=${assignment.id}`;
+      };
+      
+      const submitBtn = document.createElement("button");
+      submitBtn.className = "btn btn-primary";
+      submitBtn.textContent = "Submit Assignment";
+      submitBtn.onclick = () => {
+        localStorage.setItem("selectedAssignmentId", assignment.id);
+        window.location.href = "submit.html";
+      };
+      
+      actions.appendChild(viewBtn);
+      actions.appendChild(submitBtn);
+    } else {
+      // Teacher buttons - only View Submissions
+      const viewSubmissionsBtn = document.createElement("button");
+      viewSubmissionsBtn.className = "btn btn-primary";
+      viewSubmissionsBtn.textContent = "📋 View Submissions";
+      viewSubmissionsBtn.onclick = () => {
+        window.location.href = `view-submissions.html?assignment_id=${assignment.id}`;
+      };
+      
+      actions.appendChild(viewSubmissionsBtn);
+    }
+
+    item.appendChild(header);
+    item.appendChild(content);
+    item.appendChild(actions);
+    list.appendChild(item);
   });
 }
 
-// ---- Teacher: Create TEXT assignment ----
-document.getElementById("createAssignmentBtn").onclick = async () => {
-  const title = document.getElementById("title").value;
-  const description = document.getElementById("description").value;
-
-  if (!title || !description) {
-    alert("Title and description required");
-    return;
-  }
-
-  const res = await fetch(`${API_BASE}/assignments`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify({ title, description })
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    alert(data.detail || "Failed to create assignment");
-    return;
-  }
-
-  alert("Assignment created!");
-  document.getElementById("title").value = "";
-  document.getElementById("description").value = "";
-  loadAssignments();
-};
-
-// ---- Teacher: Upload PDF assignment ----
-document.getElementById("uploadPdfBtn").onclick = async () => {
-  const fileInput = document.getElementById("pdfFile");
-
-  if (!fileInput.files.length) {
-    alert("Select a PDF file first");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("file", fileInput.files[0]);
-
-  const res = await fetch(`${API_BASE}/assignments/upload-pdf`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`
-    },
-    body: formData
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    alert(data.detail || "PDF upload failed");
-    return;
-  }
-
-  alert("PDF assignment uploaded!");
-  fileInput.value = "";
-  loadAssignments();
-};
-
-// Initial load
+// Load assignments on page load
 loadAssignments();

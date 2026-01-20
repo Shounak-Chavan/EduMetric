@@ -1,14 +1,14 @@
-// If already logged in → go to dashboard
+// Check if already logged in
 const token = localStorage.getItem("accessToken");
 if (token) {
   window.location.href = "dashboard.html";
 }
 
-// Buttons
-document.getElementById("loginBtn").onclick = () => {
+// Button handlers
+document.getElementById("loginBtn").addEventListener("click", () => {
   window.location.href = "login.html";
-};
+});
 
-document.getElementById("registerBtn").onclick = () => {
+document.getElementById("registerBtn").addEventListener("click", () => {
   window.location.href = "register.html";
-};
+});

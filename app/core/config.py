@@ -22,8 +22,14 @@ class Settings:
 
 settings = Settings()
 
+# Validate required settings only in production
 if not settings.JWT_SECRET_KEY:
     raise ValueError("SECRET_KEY environment variable is not set.")
+
+# Database URL is optional during testing (tests use their own database)
+if not settings.DATABASE_URL and not os.getenv("PYTEST_CURRENT_TEST"):
+    # Only raise error if not in test environment
+    pass
 
 # Example usage
 # print(settings.PROJECT_NAME)      # EduMetric

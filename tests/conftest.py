@@ -7,20 +7,30 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
 
 # Import your FastAPI app and database models
 from app.main import app
 from app.db.base import Base
 from app.db.session import get_db
 
-# Create a test database URL (using SQLite in-memory for simplicity)
-# For PostgreSQL testing, use: "postgresql://user:password@localhost/test_db"
-SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///./test.db"
+# Use PostgreSQL test database (matches GitHub Actions setup)
+# Falls back to SQLite if PostgreSQL not available locally
+database_url = os.getenv(
+    "DATABASE_URL",
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/edumetric_test"
+)
+
+# For local testing with SQLite, you can use:
+# SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///./test.db"
+# But GitHub Actions uses PostgreSQL
+
+SQLALCHEMY_TEST_DATABASE_URL = database_url
 
 # Create test engine
 engine = create_engine(
     SQLALCHEMY_TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False}  # Only needed for SQLite
+    connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_TEST_DATABASE_URL else {}
 )
 
 # Create tables for testing

@@ -11,6 +11,22 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    
+    # PostgreSQL service for testing
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     # Check out the code
@@ -42,11 +58,12 @@ jobs:
     # Run pytest if test files exist
     - name: Run tests with pytest
       env:
-        # Test environment variables (used only for CI/CD, not sensitive)
+        # Test environment variables
         SECRET_KEY: test-secret-key-for-ci-cd-only
         ALGORITHM: HS256
         ACCESS_TOKEN_EXPIRE_MINUTES: 60
-        DATABASE_URL: sqlite+aiosqlite:///:memory:
+        # PostgreSQL async connection for testing
+        DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/test_db
         DEBUG: True
         APP_NAME: EduMetric
       run: |

@@ -1,6 +1,5 @@
 """
-Pytest configuration and async fixtures.
-This file contains async setup and fixtures used across all tests.
+Pytest configuration and async fixtures for PostgreSQL testing.
 """
 
 import pytest
@@ -9,26 +8,25 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-# Import your FastAPI app and database models
 from app.main import app
 from app.db.base import Base
 from app.db.session import get_db
 
-# Configure pytest-asyncio
-pytestmark = pytest.mark.asyncio
+# Use same PostgreSQL URL as configured in environment
+# In GitHub Actions, this will be: postgresql+asyncpg://postgres:postgres@localhost:5432/test_db
+# Locally, update your .env to use a test database
+TEST_DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
+)
 
-# Use async SQLite with aiosqlite driver
-# Format: sqlite+aiosqlite:///path/to/db
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
-
-# Create async engine with SQLite
+# Create async engine for testing (same as production setup)
 test_engine = create_async_engine(
     TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
     echo=False,  # Set to True for SQL debugging
 )
 
-# Create async session factory
+# Create async session factory for testing
 TestingAsyncSessionLocal = sessionmaker(
     test_engine,
     class_=AsyncSession,
@@ -39,7 +37,7 @@ TestingAsyncSessionLocal = sessionmaker(
 
 async def override_get_db():
     """
-    Override the get_db dependency for testing.
+    Override database dependency for testing.
     Returns an async session from test database.
     """
     async with TestingAsyncSessionLocal() as session:
@@ -50,7 +48,13 @@ async def override_get_db():
 async def setup_db():
     """
     Create and cleanup test database tables for each test.
-    This runs before and after each test function.
+    
+    This fixture:
+    1. Creates all tables before the test runs
+    2. Yields control to the test
+    3. Drops all tables after the test completes
+    
+    Ensures clean, isolated test environment.
     """
     # Create all tables before test
     async with test_engine.begin() as conn:
@@ -58,7 +62,7 @@ async def setup_db():
     
     yield
     
-    # Drop all tables after test
+    # Drop all tables after test (cleanup)
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
@@ -67,12 +71,21 @@ async def setup_db():
 def client(setup_db):
     """
     Create FastAPI TestClient with overridden database dependency.
-    This is a synchronous fixture that uses the async setup_db fixture.
+    
+    This is a synchronous fixture because:
+    - FastAPI TestClient is synchronous
+    - It handles async route execution internally
+    - setup_db is awaited by pytest-asyncio before this runs
+    
+    Usage:
+        def test_endpoint(self, client):
+            response = client.get("/api/endpoint")
+            assert response.status_code == 200
     """
-    # Override the get_db dependency with our test version
+    # Override the get_db dependency with test version
     app.dependency_overrides[get_db] = override_get_db
     
-    # Create test client (FastAPI TestClient is synchronous)
+    # Create test client
     test_client = TestClient(app)
     
     yield test_client
@@ -85,10 +98,16 @@ def client(setup_db):
 def auth_token():
     """
     Create a mock JWT token for testing protected routes.
-    This is a fake token - in real scenarios, you'd generate a valid JWT.
+    
+    This is a fake token structure (not cryptographically valid).
+    In production, you would generate real tokens using your security functions.
+    
+    Usage:
+        def test_protected(self, authenticated_client):
+            response = authenticated_client.get("/api/protected")
+            assert response.status_code == 200
     """
-    # Example JWT token structure (not cryptographically valid)
-    # header.payload.signature
+    # JWT token format: header.payload.signature
     test_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImV4cCI6OTk5OTk5OTk5OX0.fake_token"
     return test_token
 
@@ -97,7 +116,14 @@ def auth_token():
 def authenticated_client(client, auth_token):
     """
     Create a TestClient with authorization headers set.
-    Use this fixture for testing protected/authenticated routes.
+    
+    This fixture automatically adds Bearer token to all requests.
+    Use this for testing endpoints that require authentication.
+    
+    Usage:
+        def test_protected_route(self, authenticated_client):
+            response = authenticated_client.get("/api/protected")
+            assert response.status_code == 200
     """
     client.headers = {
         "Authorization": f"Bearer {auth_token}"

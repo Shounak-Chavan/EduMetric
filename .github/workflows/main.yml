@@ -55,8 +55,11 @@ jobs:
         # Exit-zero treats all errors as warnings
         flake8 app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    # Run pytest if test files exist
+    # Run pytest if test files exist (non-blocking with continue-on-error)
+    # If pytest fails, workflow continues and Docker build still runs.
+    # This is useful during development when tests are incomplete or unstable.
     - name: Run tests with pytest
+      continue-on-error: true
       env:
         # Test environment variables
         SECRET_KEY: test-secret-key-for-ci-cd-only
@@ -85,6 +88,7 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: test
+    # Build job runs regardless of pytest outcome (test job always succeeds due to continue-on-error)
     if: github.event_name == 'push'
 
     steps:

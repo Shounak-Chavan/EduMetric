@@ -32,4 +32,4 @@ email-validator
 httpx
 pdfplumber
 python-multipart
-
+aiosqlite

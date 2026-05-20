@@ -13,7 +13,10 @@ passlib
 bcrypt==4.0.1
 pydantic-settings
 pytest
+pytest-cov
+pytest-asyncio
 httpx
+flake8
 redis
 redis[async]
 snakeviz
@@ -26,6 +29,7 @@ python-jose[cryptography]
 psycopg2-binary
 asyncpg
 email-validator
+httpx
 pdfplumber
 python-multipart
 

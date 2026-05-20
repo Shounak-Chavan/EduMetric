@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+# Trigger on push and pull requests
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+    # Check out the code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Setup Python environment
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov flake8
+
+    # Run linting check (optional but recommended)
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    # Run pytest if test files exist
+    - name: Run tests with pytest
+      run: |
+        if [ -d "tests" ]; then
+          pytest --cov=app --cov-report=xml --cov-report=html --cov-report=term -v;
+        else
+          echo "No tests directory found, skipping pytest";
+        fi
+
+    # Upload coverage report
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+
+    steps:
+    # Check out the code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Build Docker image (for testing purposes on push)
+    - name: Build Docker image
+      run: |
+        docker build -t edumetric:latest .
+        echo "Docker image built successfully"
+
+    # Verify Docker image can run
+    - name: Test Docker image
+      run: |
+        docker run --rm edumetric:latest python -c "from app.main import app; print('FastAPI app imports successfully')"

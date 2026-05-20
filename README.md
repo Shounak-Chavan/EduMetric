@@ -15,6 +15,31 @@ This project demonstrates **real-world backend engineering** with role-based acc
 
 ---
 
+## 🆕 What's New (v2.0)
+
+✨ **Production-Ready DevOps Setup:**
+- 🐳 **Dockerfile** – Complete containerization for easy deployment
+- 🚀 **GitHub Actions CI/CD** – Automated testing on every push/PR
+- 🧪 **Pytest Test Suite** – Comprehensive API and auth tests
+- 📊 **Code Coverage** – Automated coverage reports
+- 🔧 **Professional Linting** – Flake8 code quality checks
+
+### 📦 New Files Overview
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Python 3.13 container with FastAPI setup, health checks |
+| `.dockerignore` | Excludes unnecessary files from Docker build |
+| `.github/workflows/main.yml` | GitHub Actions: auto-test on push/PR, build Docker image |
+| `tests/conftest.py` | Pytest fixtures for test database, auth, API client |
+| `tests/test_api.py` | Tests for basic endpoints, responses, status codes |
+| `tests/test_auth.py` | Tests for login, tokens, protected routes |
+| `tests/test_examples.py` | Real-world test examples for your endpoints |
+| `pytest.ini` | Pytest configuration and test markers |
+| `requirements.txt` | Updated with pytest, pytest-cov, pytest-asyncio, flake8 |
+
+---
+
 ## 🔥 Features
 
 - 🔐 **JWT Authentication**: Secure token-based auth with role management
@@ -181,6 +206,159 @@ uvicorn app.main:app --reload --port 8000
 
 ---
 
+## 🐳 Docker Setup
+
+### Build Docker Image
+
+```bash
+# Build the image
+docker build -t edumetric:latest .
+
+# Run the container
+docker run -p 8000:8000 \
+  -e DATABASE_URL="postgresql://user:password@host:5432/edumetric" \
+  edumetric:latest
+```
+
+### Dockerfile Features
+
+- ✅ Python 3.13-slim base image (lightweight)
+- ✅ Optimized dependency caching (requirements.txt copied first)
+- ✅ Non-root user for security
+- ✅ Health checks enabled
+- ✅ Multi-stage optimizations
+- ✅ Proper signal handling
+
+### .dockerignore
+
+Excludes unnecessary files:
+- Python cache and virtual environments
+- IDE configurations (.vscode, .idea)
+- Git files
+- Test coverage reports
+- Environment files
+
+---
+
+## 🧪 Testing with Pytest
+
+### Run Tests Locally
+
+```bash
+# Run all tests
+pytest -v
+
+# Run with coverage report
+pytest --cov=app --cov-report=html
+
+# Run specific test file
+pytest tests/test_api.py -v
+
+# Run with output display
+pytest -v -s
+```
+
+### Test Structure
+
+```
+tests/
+├── conftest.py           # Fixtures and test configuration
+├── test_api.py           # Basic API endpoint tests
+├── test_auth.py          # Authentication tests
+└── test_examples.py      # Real-world example tests
+```
+
+### Test Fixtures
+
+The `conftest.py` provides reusable fixtures:
+
+- `client` – FastAPI TestClient for making API requests
+- `authenticated_client` – Client with JWT authorization headers
+- `db` – Test database session (SQLite for isolation)
+- `auth_token` – Mock JWT token for testing
+
+### Example Tests
+
+**API Test:**
+```python
+def test_root_endpoint(self, client):
+    response = client.get("/")
+    assert response.status_code == 200
+```
+
+**Auth Test:**
+```python
+def test_protected_route_without_token(self, client):
+    response = client.get("/api/v1/assignments")
+    assert response.status_code == 401  # Unauthorized
+```
+
+**Protected Route Test:**
+```python
+def test_protected_route_with_token(self, authenticated_client):
+    response = authenticated_client.get("/api/v1/assignments")
+    assert response.status_code in [200, 404]
+```
+
+### Coverage Report
+
+Generate and view HTML coverage report:
+
+```bash
+pytest --cov=app --cov-report=html
+# Open: htmlcov/index.html
+```
+
+---
+
+## 🚀 GitHub Actions CI/CD
+
+### Automated Workflow
+
+Tests run automatically on:
+- ✅ Every push to `main` or `develop` branch
+- ✅ Every pull request
+
+### Workflow Steps
+
+1. **Checkout Code** – Clone repository
+2. **Setup Python** – Install Python 3.13
+3. **Install Dependencies** – From requirements.txt
+4. **Linting** – Run flake8 for code quality
+5. **Run Tests** – Execute pytest with coverage
+6. **Build Docker** – Create Docker image
+7. **Verify Docker** – Test image can start
+
+### View Workflow Results
+
+1. Push code to GitHub
+2. Go to **Actions** tab
+3. Click the workflow run
+4. View test results, logs, and coverage
+
+### Workflow Configuration
+
+The `.github/workflows/main.yml` file defines:
+- Trigger events (push, pull request)
+- Python 3.13 environment
+- Test and build jobs
+- Codecov coverage upload
+
+---
+
+## ✅ Testing Checklist
+
+- [ ] Run tests locally: `pytest -v`
+- [ ] Check coverage: `pytest --cov=app --cov-report=html`
+- [ ] Run linting: `flake8 app`
+- [ ] Build Docker image: `docker build -t edumetric:latest .`
+- [ ] Test Docker image: `docker run -p 8000:8000 edumetric:latest`
+- [ ] Push to GitHub and verify Actions pass
+
+---
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -221,7 +399,19 @@ EduMetric/
 │   ├── css/                   # Stylesheets
 │   ├── js/                    # JavaScript files
 │   └── *.html                 # HTML pages
-└── requirements.txt
+├── tests/                     # Unit tests
+│   ├── conftest.py            # Test fixtures & configuration
+│   ├── test_api.py            # API endpoint tests
+│   ├── test_auth.py           # Authentication tests
+│   └── test_examples.py       # Real-world example tests
+├── .github/
+│   └── workflows/
+│       └── main.yml           # GitHub Actions CI/CD pipeline
+├── Dockerfile                 # Docker containerization
+├── .dockerignore               # Docker build exclusions
+├── pytest.ini                 # Pytest configuration
+├── requirements.txt           # Python dependencies
+└── README.md
 ```
 
 ---
@@ -276,7 +466,59 @@ EduMetric/
 
 ---
 
-## 🧩 Key Learnings
+## 📚 Quick Developer Reference
+
+### Essential Commands
+
+```bash
+# Development
+uvicorn app.main:app --reload --port 8000
+
+# Testing
+pytest -v                                    # Run all tests
+pytest --cov=app --cov-report=html          # With coverage
+pytest tests/test_auth.py -v                # Specific file
+pytest -k "test_login" -v                   # Pattern match
+
+# Docker
+docker build -t edumetric:latest .          # Build image
+docker run -p 8000:8000 edumetric:latest    # Run image
+
+# Code Quality
+flake8 app                                   # Linting
+flake8 app --max-line-length=127            # With options
+
+# Database
+python -c "from app.db.init_db import init_db; import asyncio; asyncio.run(init_db())"
+
+# Dependencies
+pip install -r requirements.txt              # Install
+pip list                                     # Check installed
+```
+
+### Project URLs
+
+| URL | Purpose |
+|-----|---------|
+| `http://localhost:8000/` | API Root |
+| `http://localhost:8000/docs` | Swagger UI |
+| `http://localhost:8000/redoc` | ReDoc Documentation |
+| `http://localhost:8000/home.html` | Landing Page |
+| `http://localhost:8000/login.html` | Login Page |
+| `http://localhost:8000/dashboard.html` | Dashboard |
+
+### Environment Variables
+
+```env
+APP_NAME=EduMetric              # App identifier
+DEBUG=True                      # Enable debug mode
+SECRET_KEY=your-secret-key      # JWT secret (change in production!)
+ALGORITHM=HS256                 # JWT algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES=60  # Token validity
+DATABASE_URL=postgresql://...   # Database connection
+```
+
+---
 
 - ✅ **Role-Based Access Control** (RBAC) implementation
 - ✅ **JWT authentication** with FastAPI
@@ -288,6 +530,11 @@ EduMetric/
 - ✅ **API design** following REST principles
 - ✅ **Error handling** and validation
 - ✅ **Clean architecture** with separation of concerns
+- ✅ **Containerization with Docker** for deployment
+- ✅ **CI/CD automation with GitHub Actions** for testing
+- ✅ **Unit testing with pytest** and FastAPI TestClient
+- ✅ **Test fixtures** for test isolation
+- ✅ **Code coverage** reporting and monitoring
 
 ---
 
@@ -296,8 +543,7 @@ EduMetric/
 - 📊 **Analytics Dashboard** with charts (marks distribution, submission trends)
 - 🔄 **Real-time notifications** (WebSockets for grade updates)
 - 📄 **Pagination** for large submission lists
-- 🧪 **Unit & Integration Tests** with pytest
-- 🐳 **Docker Compose** for easy deployment
+- 🐳 **Docker Compose** for multi-container orchestration
 - ☁️ **Cloud Deployment** (Render/Railway/AWS)
 - 📝 **Rich text editor** for submissions
 - 🎨 **Dark mode** toggle
@@ -335,9 +581,70 @@ CREATE DATABASE edumetric;
 - Check file size (large PDFs may timeout)
 - Verify pdfplumber is installed correctly
 
+### Tests Not Running
+```bash
+# Activate virtual environment
+source myvenv/Scripts/activate  # Linux/Mac
+myvenv\Scripts\activate         # Windows
+
+# Install test dependencies
+pip install -r requirements.txt
+
+# Run tests with verbose output
+pytest -v
+```
+
+### Docker Build Fails
+- Ensure all dependencies in `requirements.txt` are installable
+- Check that `.dockerignore` doesn't exclude essential files
+- Try clearing Docker cache: `docker build --no-cache -t edumetric:latest .`
+
+### Docker Runtime Errors
+- Verify DATABASE_URL environment variable is set
+- Ensure PostgreSQL is accessible from container
+- Check port 8000 is not in use: `docker run -p 8000:8000 edumetric:latest`
+
+### GitHub Actions Workflow Failing
+- Check test output in Actions tab
+- Ensure `requirements.txt` has all dependencies
+- Verify `.env` variables are not needed for tests
+- Check Python version compatibility (3.13 required)
+
 ---
 
-## ⚠️ Disclaimer
+## 🚢 Deployment
+
+### Local Development
+```bash
+# Using uvicorn directly
+uvicorn app.main:app --reload --port 8000
+```
+
+### Docker Deployment
+```bash
+# Build and run with Docker
+docker build -t edumetric:latest .
+docker run -p 8000:8000 \
+  -e DATABASE_URL="postgresql://user:password@host:5432/edumetric" \
+  edumetric:latest
+```
+
+### Cloud Deployment Options
+- **Render**: Connect GitHub repo → Deploy on push
+- **Railway**: Similar to Render, easy setup
+- **AWS**: EC2 with Docker, RDS for PostgreSQL
+- **DigitalOcean**: App Platform with GitHub integration
+
+### Pre-Deployment Checklist
+- ✅ All tests pass: `pytest -v`
+- ✅ Docker image builds: `docker build -t edumetric:latest .`
+- ✅ `.env` file never committed to GitHub
+- ✅ `SECRET_KEY` changed in production
+- ✅ Database URL points to production database
+- ✅ Ollama running and accessible
+- ✅ GitHub Actions workflow passes
+
+---
 
 This project is **for educational purposes** to demonstrate full-stack development with AI integration. Not recommended for production without proper security hardening, testing, and scalability improvements.
 

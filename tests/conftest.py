@@ -2,9 +2,9 @@
 Pytest configuration and async fixtures for PostgreSQL testing.
 """
 
-import os
-
+import pytest
 import pytest_asyncio
+
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -59,8 +59,8 @@ async def setup_db():
 
 
 # FastAPI test client fixture
-@pytest_asyncio.fixture(scope="function")
-async def client(setup_db):
+@pytest.fixture(scope="function")
+def client(setup_db):
 
     # Override DB dependency
     app.dependency_overrides[get_db] = override_get_db
@@ -74,8 +74,8 @@ async def client(setup_db):
 
 
 # Mock JWT token fixture
-@pytest_asyncio.fixture(scope="function")
-async def auth_token():
+@pytest.fixture(scope="function")
+def auth_token():
 
     return (
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
@@ -85,8 +85,8 @@ async def auth_token():
 
 
 # Authenticated client fixture
-@pytest_asyncio.fixture(scope="function")
-async def authenticated_client(client, auth_token):
+@pytest.fixture(scope="function")
+def authenticated_client(client, auth_token):
 
     client.headers = {
         "Authorization": f"Bearer {auth_token}"

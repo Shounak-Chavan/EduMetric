@@ -3,40 +3,92 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main ]
+
   pull_request:
     branches: [ main ]
 
 jobs:
   build:
-    name: Lint and Build
     runs-on: ubuntu-latest
 
+    # PostgreSQL service container for testing
+    services:
+      postgres:
+        image: postgres:16
+
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    # Environment variables
+    env:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/test_db
+
     steps:
+
+    # Checkout repository
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python 3.13
+    # Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
-        cache: 'pip'
+        python-version: "3.13"
+        cache: "pip"
 
+    # Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install flake8
 
-    - name: Lint with flake8
+    # Lint code
+    - name: Lint code
       run: |
         flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Build Docker image
+    # Run pytest tests
+    - name: Run tests
       run: |
-        docker build -t edumetric:latest .
-        echo "Docker image built successfully"
+        pytest
 
-    - name: Verify Docker image
+    # Login to Docker Hub
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # Build and push Docker image
+    - name: Build and Push Docker image
       run: |
-        docker run --rm edumetric:latest python -c "print('Docker container runs successfully')"
+        IMAGE_TAG=v${{ github.run_number }}
+
+        docker build -t shounakchavan/edumetric:$IMAGE_TAG .
+        docker tag shounakchavan/edumetric:$IMAGE_TAG shounakchavan/edumetric:latest
+
+        docker push shounakchavan/edumetric:$IMAGE_TAG
+        docker push shounakchavan/edumetric:latest
+
+    # Verify Docker container
+    - name: Verify Docker container
+      run: |
+        docker run --rm shounakchavan/edumetric:latest python -c "print('Container validation successful')"
+
+    # Deployment status
+    - name: Deployment status
+      run: |
+        echo "CI/CD pipeline completed successfully"
+        echo "Docker image pushed to Docker Hub with version tags"

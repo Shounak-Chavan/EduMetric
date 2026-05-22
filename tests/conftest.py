@@ -2,9 +2,9 @@
 Pytest configuration and async fixtures for PostgreSQL testing.
 """
 
-import asyncio
 import pytest
 import pytest_asyncio
+from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -19,54 +19,56 @@ TEST_DATABASE_URL = (
     "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
 )
 
+# ✅ Module-level engine — created once, lives for entire session
+test_engine = create_async_engine(
+    TEST_DATABASE_URL,
+    echo=False,
+    pool_pre_ping=False,   # ✅ disable pre-ping to avoid loop conflicts
+)
 
-# ✅ session-scoped so one engine lives for the entire test run
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
+TestingAsyncSessionLocal = sessionmaker(
+    bind=test_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+)
+
+
+async def override_get_db():
+    async with TestingAsyncSessionLocal() as session:
+        yield session
+
+
+async def mock_init_db():
+    """
+    ✅ Replace app's init_db so it doesn't create its own engine.
+    Tables are already created by setup_db fixture.
+    """
+    pass
 
 
 @pytest_asyncio.fixture(scope="session")
-async def test_engine():
-    engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-    yield engine
-    await engine.dispose()
-
-
-@pytest_asyncio.fixture(scope="session")
-async def setup_db(test_engine):
-    # Create all tables once for entire test session
+async def setup_db():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
     yield
 
-    # Drop all tables after all tests done
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+    await test_engine.dispose()
 
-# ✅ function-scoped client — fresh dependency override per test
+
 @pytest.fixture(scope="function")
-def client(setup_db, test_engine):
-
-    TestingAsyncSessionLocal = sessionmaker(
-        bind=test_engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-        autoflush=False,
-    )
-
-    async def override_get_db():
-        async with TestingAsyncSessionLocal() as session:
-            yield session
+def client(setup_db):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    with TestClient(app) as test_client:
-        yield test_client
+    # ✅ Patch init_db so lifespan doesn't spin up a second engine
+    with patch("app.db.init_db.init_db", new=mock_init_db):
+        with TestClient(app) as test_client:
+            yield test_client
 
     app.dependency_overrides.clear()
 

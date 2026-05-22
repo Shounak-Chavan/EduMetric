@@ -16,7 +16,7 @@ from app.db.session import get_db
 
 # PostgreSQL test database URL
 TEST_DATABASE_URL = (
-    "postgresql+asyncpg://postgres:Shounak%402450@localhost:5432/test_db"
+    "postgresql+asyncpg://postgres:postgres@localhost:5432/test_db"
 )
 
 

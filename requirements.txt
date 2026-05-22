@@ -17,14 +17,10 @@ pytest-cov
 pytest-asyncio
 httpx
 flake8
-redis
-redis[async]
 snakeviz
 line_profiler
 locust
 prometheus-fastapi-instrumentator
-ipykernel
-xgboost
 python-jose[cryptography]
 psycopg2-binary
 asyncpg
@@ -32,4 +28,3 @@ email-validator
 httpx
 pdfplumber
 python-multipart
-aiosqlite

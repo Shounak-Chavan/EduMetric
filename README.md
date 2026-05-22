@@ -1,661 +1,738 @@
+# 🎓 EduMetric – AI-Powered Assignment Grading System
+
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.13-blue?logo=python" />
-  <img src="https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi" />
-  <img src="https://img.shields.io/badge/PostgreSQL-Database-336791?logo=postgresql" />
-  <img src="https://img.shields.io/badge/Ollama-AI-000000?logo=ollama" />
-  <img src="https://img.shields.io/badge/Modern-UI-FF6B6B" />
+  <img src="https://img.shields.io/badge/Python-3.13-3776ab?logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/FastAPI-0.104+-009688?logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Ollama-AI-000000?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6Ii8+PC9zdmc+" />
+  <img src="https://img.shields.io/badge/License-MIT-green?logo=opensourceinitiative&logoColor=white" />
 </p>
 
-# 📚 EduMetric – AI-Powered Assignment Grading System
-### *(FastAPI • JWT Auth • RBAC • Ollama AI • PostgreSQL • PDF Extraction • Modern UI)*
+---
 
-A production-ready full-stack application that automates assignment grading using local AI (Ollama). Teachers upload assignments, students submit answers (text or PDF), and AI evaluates them instantly with detailed feedback.
+## 📌 Overview
 
-This project demonstrates **real-world backend engineering** with role-based access control, PDF processing, and AI integration.
+**EduMetric** is a production-ready full-stack application that automates assignment grading using **local AI (Ollama)**. Teachers create assignments and set reference answers, students submit solutions (text or PDF), and the system evaluates submissions instantly using an AI model with detailed feedback.
+
+This project demonstrates **enterprise-grade backend engineering** with:
+- Role-based access control (RBAC)
+- Asynchronous database operations
+- PDF text extraction and parsing
+- Local LLM integration
+- Comprehensive testing and CI/CD automation
+- Docker containerization for seamless deployment
 
 ---
 
-## 🆕 What's New (v2.0)
+## ✨ Key Features
 
-✨ **Production-Ready DevOps Setup:**
-- 🐳 **Dockerfile** – Complete containerization for easy deployment
-- 🚀 **GitHub Actions CI/CD** – Automated testing on every push/PR
-- 🧪 **Pytest Test Suite** – Comprehensive API and auth tests
-- 📊 **Code Coverage** – Automated coverage reports
-- 🔧 **Professional Linting** – Flake8 code quality checks
-
-### 📦 New Files Overview
-
-| File | Purpose |
-|------|---------|
-| `Dockerfile` | Python 3.13 container with FastAPI setup, health checks |
-| `.dockerignore` | Excludes unnecessary files from Docker build |
-| `.github/workflows/main.yml` | GitHub Actions: auto-test on push/PR, build Docker image |
-| `tests/conftest.py` | Pytest fixtures for test database, auth, API client |
-| `tests/test_api.py` | Tests for basic endpoints, responses, status codes |
-| `tests/test_auth.py` | Tests for login, tokens, protected routes |
-| `tests/test_examples.py` | Real-world test examples for your endpoints |
-| `pytest.ini` | Pytest configuration and test markers |
-| `requirements.txt` | Updated with pytest, pytest-cov, pytest-asyncio, flake8 |
+| Feature | Description |
+|---------|-------------|
+| 🔐 **JWT Authentication** | Secure token-based authentication with role management |
+| 👥 **Role-Based Access Control** | Separate workflows for teachers and students |
+| 🤖 **AI-Powered Grading** | Ollama local LLM evaluates structured assignments with feedback |
+| 📄 **PDF Support** | Upload assignments and submit answers via PDF with text extraction |
+| ✍️ **Text Submissions** | Direct text input for quick submissions |
+| 📊 **Submission Tracking** | Students view submission history, grades, and AI feedback |
+| 👨‍🏫 **Teacher Dashboard** | Create, manage assignments, and trigger AI grading |
+| 🎨 **Modern UI** | Glassmorphic design with smooth animations and responsive layout |
+| 🗄️ **PostgreSQL Database** | Normalized relational schema with async SQLAlchemy ORM |
+| 🐳 **Docker Ready** | Containerized deployment with health checks |
+| 🚀 **GitHub Actions CI/CD** | Automated testing, linting, and Docker image building |
+| 🧪 **Pytest Test Suite** | Comprehensive API and authentication tests |
 
 ---
 
-## 🔥 Features
+## 🏗️ System Architecture
 
-- 🔐 **JWT Authentication**: Secure token-based auth with role management
-- 👥 **Role-Based Access Control**: Separate workflows for Teachers & Students
-- 🤖 **AI-Powered Grading**: Local Ollama LLM evaluates submissions with feedback
-- 📄 **PDF Support**: Upload assignments and submit answers via PDF
-- ✍️ **Text Submissions**: Direct text input for assignment answers
-- 📊 **Submission Tracking**: Students view grades and feedback history
-- 👨‍🏫 **Teacher Dashboard**: Create assignments, view submissions, grade manually
-- 📈 **Assignment Analytics**: Track submission status and student performance
-- 🎨 **Modern UI**: Glassmorphic design with smooth animations
-- 🗄️ **PostgreSQL Storage**: Persistent data with SQLAlchemy ORM
-- 📱 **Responsive Design**: Mobile-friendly interface
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       Frontend (Browser)                     │
+│          HTML5 • CSS3 • Vanilla JavaScript                   │
+└────────────────────┬────────────────────────────────────────┘
+                     │ Fetch API (JSON)
+                     ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    FastAPI Backend                           │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ Authentication (JWT) • RBAC • Exception Handlers    │   │
+│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ API Routers (Auth, Assignment, Submission, Grading) │   │
+│  └─────────────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ Services (PDF Extraction, Text Parsing, Grading)    │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────┬──────────────────────────┬──────────────────────────┘
+      │                          │
+      ↓                          ↓
+┌──────────────────┐    ┌─────────────────────┐
+│  PostgreSQL DB   │    │ Ollama API          │
+│  (Assignments,   │    │ (Phi Model)         │
+│   Users,         │    │ (localhost:11434)   │
+│   Submissions)   │    │                     │
+└──────────────────┘    └─────────────────────┘
+```
 
 ---
 
-## 🎓 How It Works
-
-### **For Teachers:**
-1. **Create Assignment** – Manually input or upload PDF
-2. **View Submissions** – See all student submissions in table format
-3. **AI Grading** – Click to auto-grade with Ollama AI
-4. **Review Results** – Check marks, feedback, and student answers
-
-### **For Students:**
-1. **Browse Assignments** – View assignment details and requirements
-2. **Submit Answers** – Type directly or upload PDF
-3. **Track Status** – See submission status (Pending/Evaluated)
-4. **View Grades** – Check marks obtained and AI feedback
-
----
-
-## 🧰 Tech Stack
+## 🛠️ Tech Stack
 
 ### **Backend**
-- **FastAPI** – High-performance async API framework
-- **SQLAlchemy(Async)** – Database operations
-- **PostgreSQL** – Relational database
-- **JWT** – Secure authentication tokens
-- **Ollama (Phi model)** – Local AI for grading
-- **pdfplumber** – PDF text extraction
-- **Pydantic** – Data validation
+- **FastAPI 0.104+** – Async web framework with automatic OpenAPI docs
+- **SQLAlchemy 2.0+ (Async)** – Async ORM for database operations
+- **PostgreSQL 16** – Relational database
+- **Pydantic** – Data validation and serialization
+- **Python-Jose + Cryptography** – JWT token generation and validation
+- **Passlib + Bcrypt** – Secure password hashing
+- **Pdfplumber** – PDF text extraction (text-based PDFs)
 
 ### **Frontend**
-- **HTML5/CSS3** – Modern semantic markup
-- **Vanilla JavaScript** – No frameworks, pure JS
-- **Fetch API** – REST API communication
-- **CSS Animations** – Smooth transitions and effects
-- **Responsive Design** – Mobile-first approach
+- **HTML5/CSS3** – Semantic markup with modern styling
+- **Vanilla JavaScript (ES6+)** – No framework dependencies
+- **Fetch API** – Browser HTTP client
+- **LocalStorage** – Client-side JWT token persistence
 
-### **Security**
-- Password hashing with bcrypt
-- JWT token validation
-- Role-based route protection
-- SQL injection prevention
+### **AI & ML**
+- **Ollama** – Local LLM inference platform (free, runs locally)
+- **Phi Model** – Lightweight language model for grading
+- **Requests** – HTTP library for Ollama API communication
 
----
-
-## 🔐 Authentication Flow
-
-1. User registers as Teacher or Student
-2. Login returns JWT access token
-3. Token stored in browser `localStorage`
-4. All API requests include `Authorization: Bearer <token>`
-5. Backend validates token and role permissions
-
-```
-Register → Login → JWT → Protected Routes → Response
-```
+### **DevOps & Testing**
+- **Docker** – Container runtime with health checks
+- **GitHub Actions** – CI/CD pipeline for automated testing
+- **Pytest** – Unit and integration testing framework
+- **Pytest-Asyncio** – Async test support
+- **Flake8** – Code quality linting
+- **Pytest-Cov** – Code coverage analysis
 
 ---
 
-## 🤖 AI Grading Flow
+## 📂 Project Structure
 
-1. Student submits assignment answers
-2. Teacher clicks "Grade" button
-3. Backend sends each section to Ollama AI:
-   - Compares student answer vs reference
-   - Assigns score (0 to max marks)
-   - Generates feedback (1-2 lines)
-4. AI returns Marks and Feedback
-5. Results saved to database
-6. Student sees grade and feedback
-   
+```
+edumetric/
+├── app/
+│   ├── api/
+│   │   ├── routers_auth.py              # Register, Login, Get Current User
+│   │   ├── routers_assignment.py        # CRUD operations for assignments
+│   │   ├── routers_assignment_pdf.py    # PDF upload & extraction
+│   │   ├── routers_submission.py        # Student submissions
+│   │   └── routers_grading.py           # AI grading endpoint
+│   │
+│   ├── core/
+│   │   ├── config.py                    # Settings from environment
+│   │   ├── constants.py                 # Application constants
+│   │   ├── security.py                  # JWT & password utilities
+│   │   ├── dependencies.py              # FastAPI dependency injection
+│   │   ├── rbac.py                      # Role-based access control
+│   │   └── exceptions.py                # Custom exceptions & handlers
+│   │
+│   ├── db/
+│   │   ├── base.py                      # SQLAlchemy declarative base
+│   │   ├── session.py                   # Database session factory
+│   │   └── init_db.py                   # Database initialization
+│   │
+│   ├── models/
+│   │   ├── user.py                      # User model (Teacher/Student)
+│   │   ├── assignment.py                # Assignment model with sections
+│   │   └── submission.py                # Submission model with marks
+│   │
+│   ├── schemas/
+│   │   ├── auth.py                      # Request/Response schemas
+│   │   ├── assignment.py                # Assignment validation schemas
+│   │   └── submission.py                # Submission validation schemas
+│   │
+│   ├── services/
+│   │   ├── grading_service.py           # Ollama AI grading logic
+│   │   ├── pdf_extractor.py             # PDF text extraction
+│   │   └── text_parser.py               # Parse sections from text
+│   │
+│   └── main.py                          # FastAPI app initialization
+│
+├── frontend/
+│   ├── home.html                        # Landing page
+│   ├── login.html                       # User login
+│   ├── register.html                    # User registration
+│   ├── dashboard.html                   # Teacher/Student dashboard
+│   ├── assignments.html                 # Browse assignments
+│   ├── assignment-detail.html           # View assignment details
+│   ├── create-assignment.html           # Create assignment (Teacher)
+│   ├── upload-pdf.html                  # Upload assignment PDF
+│   ├── submit.html                      # Submit text answer
+│   ├── submit-pdf.html                  # Submit PDF answer
+│   ├── my-submissions.html              # View submissions
+│   ├── submission-detail.html           # View grades & feedback
+│   ├── view-submissions.html            # View all submissions (Teacher)
+│   ├── grading.html                     # AI grading interface
+│   │
+│   ├── css/
+│   │   └── *.css                        # Page-specific stylesheets
+│   └── js/
+│       └── *.js                         # Page-specific scripts
+│
+├── tests/
+│   ├── conftest.py                      # Pytest fixtures & test config
+│   ├── test_api.py                      # API endpoint tests
+│   ├── test_auth.py                     # Authentication tests
+│   └── test_examples.py                 # Real-world example tests
+│
+├── .github/
+│   └── workflows/
+│       └── main.yml                     # GitHub Actions CI/CD pipeline
+│
+├── Dockerfile                           # Docker image definition
+├── .dockerignore                        # Files to exclude from Docker
+├── pytest.ini                           # Pytest configuration
+├── requirements.txt                     # Python dependencies
+└── README.md                            # This file
+```
+
 ---
 
 ## 🚀 Getting Started
 
-### 1️⃣ Prerequisites
+### **Prerequisites**
 
-- **Python 3.13+**
-- **PostgreSQL** (local or cloud)
-- **Ollama** with Phi model installed
+- **Python 3.13+** – [Download](https://www.python.org/downloads/)
+- **PostgreSQL 16+** – [Download](https://www.postgresql.org/download/)
+- **Ollama** – [Download](https://ollama.ai/) with Phi model
 
-Install Ollama and pull the model:
+### **1. Install Ollama & Pull Model**
+
 ```bash
 # Install Ollama from https://ollama.ai
+# Then pull the Phi model
 ollama pull phi
+
+# Start Ollama server (runs on localhost:11434 by default)
 ollama serve
 ```
 
-### 2️⃣ Clone Repository
+### **2. Clone Repository**
 
 ```bash
-git clone https://github.com/your-username/EduMetric.git
+git clone https://github.com/Shounak-Chavan/EduMetric.git
 cd EduMetric/Project
 ```
 
-### 3️⃣ Install Dependencies
+### **3. Create Virtual Environment**
 
 ```bash
+# Windows
 python -m venv myvenv
-myvenv\Scripts\activate  # Windows
-source myvenv/bin/activate  # Linux/Mac
+myvenv\Scripts\activate
 
+# Linux/Mac
+python3 -m venv myvenv
+source myvenv/bin/activate
+```
+
+### **4. Install Dependencies**
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Configure Environment
+### **5. Configure Environment Variables**
 
-Create `.env` file in project root (not included in repo):
+Create a `.env` file in the project root:
 
 ```env
-# App Config
+# Application
 APP_NAME=EduMetric
 DEBUG=True
 
-# JWT Security
+# JWT Configuration
 SECRET_KEY=your-super-secret-key-change-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/edumetric
+# Database (PostgreSQL)
+DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/edumetric
 
-# Ollama (ensure running on localhost:11434)
+# Ollama (must be running)
+# OLLAMA_URL defaults to http://localhost:11434
 ```
 
-### 5️⃣ Initialize Database
+**⚠️ Important:** Change `SECRET_KEY` to a random string in production!
 
-Create the database in PostgreSQL first:
+### **6. Initialize Database**
+
 ```bash
+# Create database in PostgreSQL
 psql -U postgres
 CREATE DATABASE edumetric;
 \q
-```
 
-Then initialize tables:
-```bash
+# Initialize tables
 python -c "from app.db.init_db import init_db; import asyncio; asyncio.run(init_db())"
 ```
 
-### 6️⃣ Run the Application
+### **7. Run Development Server**
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 7️⃣ Access the App
-
-- 🌐 **Frontend**: http://localhost:8000/home.html
-- 📚 **API Docs**: http://localhost:8000/docs
-- 🔑 **Login**: http://localhost:8000/login.html
+The server starts at **http://localhost:8000**
 
 ---
 
-## 🐳 Docker Setup
+## 📖 Usage
 
-### Build Docker Image
+### **For Teachers**
 
-```bash
-# Build the image
-docker build -t edumetric:latest .
+1. **Register** at http://localhost:8000/register.html (select "Teacher")
+2. **Login** at http://localhost:8000/login.html
+3. **Create Assignment** – Enter title and reference answers for sections (Aim, Objectives, Code, Conclusion)
+4. **View Submissions** – See all student submissions in table format
+5. **Grade with AI** – Click "Grade" button to evaluate using Ollama
+6. **Review Results** – Check scores and AI-generated feedback
 
-# Run the container
-docker run -p 8000:8000 \
-  -e DATABASE_URL="postgresql://user:password@host:5432/edumetric" \
-  edumetric:latest
+### **For Students**
+
+1. **Register** at http://localhost:8000/register.html (select "Student")
+2. **Login** at http://localhost:8000/login.html
+3. **Browse Assignments** – View all active assignments
+4. **Submit Answer** – Type answers directly or upload PDF
+5. **Check Status** – View submission status (Pending/Evaluated)
+6. **View Grades** – See marks and AI feedback once evaluated
+
+### **AI Grading Process**
+
+```
+Student Submits
+       ↓
+Backend fetches Assignment & Submission
+       ↓
+For each section (Aim, Objectives, Code, Conclusion):
+  - Send to Ollama API:
+    * Section name
+    * Teacher reference answer
+    * Student answer
+    * Max marks
+       ↓
+  - Ollama returns: (score, feedback)
+       ↓
+Sum all section scores
+       ↓
+Save to database
+       ↓
+Student sees grade & feedback
 ```
 
-### Dockerfile Features
+---
 
-- ✅ Python 3.13-slim base image (lightweight)
-- ✅ Optimized dependency caching (requirements.txt copied first)
-- ✅ Non-root user for security
-- ✅ Health checks enabled
-- ✅ Multi-stage optimizations
-- ✅ Proper signal handling
+## 🔌 API Reference
 
-### .dockerignore
+### **Base URL**
+```
+http://localhost:8000/api/v1
+```
 
-Excludes unnecessary files:
-- Python cache and virtual environments
-- IDE configurations (.vscode, .idea)
-- Git files
-- Test coverage reports
-- Environment files
+All endpoints (except `/auth/register`, `/auth/login`) require:
+```
+Authorization: Bearer <access_token>
+```
+
+### **Authentication Endpoints**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/register/{role}` | Register user (teacher/student) | ❌ |
+| POST | `/auth/login` | Login and get JWT token | ❌ |
+| GET | `/auth/me` | Get current user info | ✅ |
+
+**Register Request:**
+```json
+{
+  "email": "teacher@example.com",
+  "password": "securepassword"
+}
+```
+
+**Login Response:**
+```json
+{
+  "access_token": "eyJhbGc...",
+  "token_type": "bearer"
+}
+```
+
+### **Assignment Endpoints**
+
+| Method | Endpoint | Description | Requires |
+|--------|----------|-------------|----------|
+| GET | `/assignments` | List all assignments | Student or Teacher |
+| POST | `/assignments` | Create assignment | Teacher |
+| GET | `/assignments/{id}` | Get assignment details | Student or Teacher |
+| POST | `/assignments/upload-pdf` | Upload assignment PDF | Teacher |
+| POST | `/assignments/extract-pdf-preview` | Preview PDF extraction | Teacher |
+
+**Create Assignment Request:**
+```json
+{
+  "title": "Python Functions",
+  "aim_ref": "Write a function...",
+  "objectives_ref": "Learn about...",
+  "code_ref": "def example(): pass",
+  "conclusion_ref": "Summary...",
+  "max_marks": 10
+}
+```
+
+### **Submission Endpoints**
+
+| Method | Endpoint | Description | Requires |
+|--------|----------|-------------|----------|
+| POST | `/assignments/{id}/submit` | Submit text answer | Student |
+| POST | `/assignments/{id}/submit-pdf` | Submit PDF answer | Student |
+| GET | `/submissions/my-submissions` | Get student's submissions | Student |
+| GET | `/submissions/{id}` | Get submission details | Student/Teacher |
+| GET | `/submissions/assignment/{id}` | Get all submissions for assignment | Teacher |
+
+**Submit Request:**
+```json
+{
+  "aim_ans": "Student's aim...",
+  "objectives_ans": "Student's objectives...",
+  "code_ans": "student_code_here",
+  "conclusion_ans": "Student's conclusion..."
+}
+```
+
+### **Grading Endpoint**
+
+| Method | Endpoint | Description | Requires |
+|--------|----------|-------------|----------|
+| POST | `/grading/assignments/{aid}/submissions/{sid}` | Grade submission with AI | Teacher |
+
+**Response:**
+```json
+{
+  "submission_id": 123,
+  "marks_obtained": 7.5,
+  "feedback": "Good implementation with minor issues.",
+  "status": "EVALUATED"
+}
+```
 
 ---
 
-## 🧪 Testing with Pytest
+## 🧪 Testing
 
-### Run Tests Locally
+### **Run All Tests**
 
 ```bash
-# Run all tests
 pytest -v
+```
 
-# Run with coverage report
-pytest --cov=app --cov-report=html
+### **Run Specific Test File**
 
-# Run specific test file
+```bash
+pytest tests/test_auth.py -v
 pytest tests/test_api.py -v
-
-# Run with output display
-pytest -v -s
 ```
 
-### Test Structure
-
-```
-tests/
-├── conftest.py           # Fixtures and test configuration
-├── test_api.py           # Basic API endpoint tests
-├── test_auth.py          # Authentication tests
-└── test_examples.py      # Real-world example tests
-```
-
-### Test Fixtures
-
-The `conftest.py` provides reusable fixtures:
-
-- `client` – FastAPI TestClient for making API requests
-- `authenticated_client` – Client with JWT authorization headers
-- `db` – Test database session (SQLite for isolation)
-- `auth_token` – Mock JWT token for testing
-
-### Example Tests
-
-**API Test:**
-```python
-def test_root_endpoint(self, client):
-    response = client.get("/")
-    assert response.status_code == 200
-```
-
-**Auth Test:**
-```python
-def test_protected_route_without_token(self, client):
-    response = client.get("/api/v1/assignments")
-    assert response.status_code == 401  # Unauthorized
-```
-
-**Protected Route Test:**
-```python
-def test_protected_route_with_token(self, authenticated_client):
-    response = authenticated_client.get("/api/v1/assignments")
-    assert response.status_code in [200, 404]
-```
-
-### Coverage Report
-
-Generate and view HTML coverage report:
+### **Run with Coverage Report**
 
 ```bash
 pytest --cov=app --cov-report=html
 # Open: htmlcov/index.html
 ```
 
+### **Run Specific Test by Name**
+
+```bash
+pytest -k "test_login" -v
+```
+
+### **Test Structure**
+
+```
+tests/
+├── conftest.py                  # Shared fixtures
+│   ├── client (FastAPI TestClient)
+│   ├── authenticated_client (with JWT)
+│   ├── db (test database session)
+│   └── auth_token (mock JWT)
+│
+├── test_api.py                  # API endpoint tests
+│   └── GET /, POST /assignments, etc.
+│
+├── test_auth.py                 # Authentication tests
+│   └── Register, Login, Protected routes
+│
+└── test_examples.py             # Real-world example tests
+    └── End-to-end workflows
+```
+
+### **Example Test**
+
+```python
+def test_login_success(client):
+    """Test successful user login"""
+    response = client.post("/auth/login", json={
+        "email": "teacher@example.com",
+        "password": "password123"
+    })
+    assert response.status_code == 200
+    assert "access_token" in response.json()
+```
+
+---
+
+## 🐳 Docker Deployment
+
+### **Build Docker Image**
+
+```bash
+docker build -t edumetric:latest .
+```
+
+### **Run Docker Container**
+
+```bash
+docker run -p 8000:8000 \
+  -e APP_NAME=EduMetric \
+  -e SECRET_KEY=your-secret-key \
+  -e DATABASE_URL=postgresql+asyncpg://user:password@host:5432/edumetric \
+  edumetric:latest
+```
+
+### **Docker Compose (Optional)**
+
+```yaml
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:password@db:5432/edumetric
+      SECRET_KEY: your-secret-key
+    depends_on:
+      - db
+    
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: edumetric
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+Run with: `docker-compose up --build`
+
 ---
 
 ## 🚀 GitHub Actions CI/CD
 
-### Automated Workflow
+The repository includes automated testing and deployment:
 
-Tests run automatically on:
-- ✅ Every push to `main` or `develop` branch
+### **Workflow Triggers**
+- ✅ Every push to `main` or `develop`
 - ✅ Every pull request
 
-### Workflow Steps
+### **Workflow Steps**
+1. **Checkout code** from GitHub
+2. **Setup Python 3.13** environment
+3. **Install dependencies** from `requirements.txt`
+4. **Run linting** with Flake8
+5. **Run tests** with Pytest and coverage
+6. **Build Docker image** and verify it runs
 
-1. **Checkout Code** – Clone repository
-2. **Setup Python** – Install Python 3.13
-3. **Install Dependencies** – From requirements.txt
-4. **Linting** – Run flake8 for code quality
-5. **Run Tests** – Execute pytest with coverage
-6. **Build Docker** – Create Docker image
-7. **Verify Docker** – Test image can start
-
-### View Workflow Results
-
+### **View Results**
 1. Push code to GitHub
 2. Go to **Actions** tab
 3. Click the workflow run
-4. View test results, logs, and coverage
-
-### Workflow Configuration
-
-The `.github/workflows/main.yml` file defines:
-- Trigger events (push, pull request)
-- Python 3.13 environment
-- Test and build jobs
-- Codecov coverage upload
+4. Review logs, test results, coverage
 
 ---
 
-## ✅ Testing Checklist
+## 📋 Environment Variables Reference
 
-- [ ] Run tests locally: `pytest -v`
-- [ ] Check coverage: `pytest --cov=app --cov-report=html`
-- [ ] Run linting: `flake8 app`
-- [ ] Build Docker image: `docker build -t edumetric:latest .`
-- [ ] Test Docker image: `docker run -p 8000:8000 edumetric:latest`
-- [ ] Push to GitHub and verify Actions pass
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `APP_NAME` | String | EduMetric | Application name |
+| `DEBUG` | Boolean | False | Enable debug mode |
+| `SECRET_KEY` | String | *(Required)* | JWT signing key (change in production!) |
+| `ALGORITHM` | String | HS256 | JWT algorithm |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Integer | 60 | JWT token expiry |
+| `DATABASE_URL` | String | *(Required)* | PostgreSQL async connection string |
 
----
-
----
-
-## 📁 Project Structure
-
-```
-EduMetric/
-├── app/
-│   ├── api/                   # API routes
-│   │   ├── routers_auth.py           # Login/Register
-│   │   ├── routers_assignment.py     # CRUD assignments
-│   │   ├── routers_assignment_pdf.py # PDF uploads
-│   │   ├── routers_grading.py        # AI grading
-│   │   └── routers_submission.py     # Student submissions
-│   ├── core/                  # Core functionality
-│   │   ├── config.py                 # Settings
-│   │   ├── dependencies.py           # Auth dependencies
-│   │   ├── rbac.py                   # Role checks
-│   │   ├── security.py               # JWT & password
-│   │   ├── constants.py              
-│   │   └── exceptions.py             # Exception Handling
-│   ├── db/                    # Database
-│   │   ├── base.py
-│   │   ├── init_db.py
-│   │   └── session.py
-│   ├── models/                # SQLAlchemy models
-│   │   ├── user.py
-│   │   ├── assignment.py
-│   │   └── submission.py
-│   ├── schemas/               # Pydantic schemas
-│   │   ├── auth.py
-│   │   ├── assignment.py
-│   │   └── submission.py
-│   ├── services/              # Business logic
-│   │   ├── grading_service.py        # Ollama AI integration
-│   │   ├── pdf_extractor.py          # PDF text extraction
-│   │   └── text_parser.py            # Parse sections
-│   ├── utils/                 # Utility functions
-│   └── main.py                # FastAPI app
-├── frontend/
-│   ├── css/                   # Stylesheets
-│   ├── js/                    # JavaScript files
-│   └── *.html                 # HTML pages
-├── tests/                     # Unit tests
-│   ├── conftest.py            # Test fixtures & configuration
-│   ├── test_api.py            # API endpoint tests
-│   ├── test_auth.py           # Authentication tests
-│   └── test_examples.py       # Real-world example tests
-├── .github/
-│   └── workflows/
-│       └── main.yml           # GitHub Actions CI/CD pipeline
-├── Dockerfile                 # Docker containerization
-├── .dockerignore               # Docker build exclusions
-├── pytest.ini                 # Pytest configuration
-├── requirements.txt           # Python dependencies
-└── README.md
+**Example `.env` File:**
+```env
+APP_NAME=EduMetric
+DEBUG=False
+SECRET_KEY=abc123xyz789change-this-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=480
+DATABASE_URL=postgresql+asyncpg://postgres:mypassword@localhost:5432/edumetric
 ```
 
 ---
 
-## 🎨 Frontend Pages
+## 🔐 Security Considerations
 
-### **Public Pages**
-- `home.html` – Landing page
-- `login.html` – User login
-- `register.html` – User registration
-
-### **Student Pages**
-- `dashboard.html` – Student dashboard
-- `assignments.html` – Browse assignments
-- `assignment-detail.html` – View assignment reference
-- `submit.html` – Submit text answers
-- `submit-pdf.html` – Submit PDF answers
-- `my-submissions.html` – View submission history
-- `submission-detail.html` – View grades & feedback
-
-### **Teacher Pages**
-- `dashboard.html` – Teacher dashboard
-- `create-assignment.html` – Manual assignment creation
-- `upload-pdf.html` – Upload PDF assignment
-- `view-submissions.html` – View all submissions
-- `grading.html` – AI grading interface
+- ✅ **Passwords hashed** with bcrypt (salted)
+- ✅ **JWT tokens signed** with secret key
+- ✅ **Role-based access control** on all protected endpoints
+- ✅ **CORS enabled** for development (restrict in production)
+- ✅ **Database prepared statements** (SQLAlchemy ORM)
+- ⚠️ **Change `SECRET_KEY`** before production deployment
+- ⚠️ **Use HTTPS** in production
+- ⚠️ **Restrict CORS origins** to specific domains
 
 ---
 
-## 🎯 API Endpoints
+## 🛠️ Troubleshooting
 
-### **Authentication**
-- `POST /auth/register/{role}` – Register user
-- `POST /auth/login` – Login & get JWT
-- `GET /auth/me` – Get current user
+### **Ollama Connection Error**
 
-### **Assignments**
-- `GET /assignments` – List all assignments
-- `POST /assignments` – Create assignment (Teacher)
-- `POST /assignments/upload-pdf` – Upload PDF (Teacher)
-- `POST /assignments/extract-pdf-preview` – Preview PDF extraction
+```bash
+# Verify Ollama is running
+curl http://localhost:11434/api/tags
 
-### **Submissions**
-- `POST /assignments/{id}/submit` – Submit text answers
-- `POST /assignments/{id}/submit-pdf` – Submit PDF
-- `GET /submissions/my-submissions` – Student's submissions
-- `GET /submissions/{id}` – Get submission details
-- `GET /submissions/assignment/{id}` – All submissions for assignment
+# If not running, start it
+ollama serve
+```
 
-### **Grading**
-- `POST /grading/assignments/{aid}/submissions/{sid}` – AI grade submission
+### **Database Connection Error**
+
+```bash
+# Check PostgreSQL is running
+psql -U postgres -c "SELECT version();"
+
+# Verify DATABASE_URL in .env
+# Create database if missing:
+createdb edumetric
+```
+
+### **PDF Extraction Fails**
+
+- Ensure PDF is **text-based** (not scanned image)
+- Check file size (large PDFs may timeout)
+- Verify pdfplumber: `python -c "import pdfplumber; print('OK')"`
+
+### **Tests Fail**
+
+```bash
+# Ensure virtual environment is active
+source myvenv/bin/activate  # Linux/Mac
+myvenv\Scripts\activate     # Windows
+
+# Reinstall dependencies
+pip install -r requirements.txt
+
+# Run tests with verbose output
+pytest -v -s
+```
+
+### **Docker Build Fails**
+
+```bash
+# Clear Docker cache
+docker build --no-cache -t edumetric:latest .
+
+# Check dependency issues
+pip install --dry-run -r requirements.txt
+```
 
 ---
 
-## 📚 Quick Developer Reference
+## 📚 Quick Reference
 
-### Essential Commands
+### **Common Commands**
 
 ```bash
 # Development
 uvicorn app.main:app --reload --port 8000
 
 # Testing
-pytest -v                                    # Run all tests
-pytest --cov=app --cov-report=html          # With coverage
-pytest tests/test_auth.py -v                # Specific file
-pytest -k "test_login" -v                   # Pattern match
-
-# Docker
-docker build -t edumetric:latest .          # Build image
-docker run -p 8000:8000 edumetric:latest    # Run image
+pytest -v
+pytest --cov=app --cov-report=html
+pytest tests/test_auth.py::test_login -v
 
 # Code Quality
-flake8 app                                   # Linting
-flake8 app --max-line-length=127            # With options
+flake8 app --max-line-length=100
+
+# Docker
+docker build -t edumetric:latest .
+docker run -p 8000:8000 edumetric:latest
 
 # Database
 python -c "from app.db.init_db import init_db; import asyncio; asyncio.run(init_db())"
 
-# Dependencies
-pip install -r requirements.txt              # Install
-pip list                                     # Check installed
+# Virtual Environment
+python -m venv myvenv
+myvenv\Scripts\activate  # Windows
+source myvenv/bin/activate  # Linux/Mac
 ```
 
-### Project URLs
+### **Key URLs**
 
 | URL | Purpose |
 |-----|---------|
-| `http://localhost:8000/` | API Root |
-| `http://localhost:8000/docs` | Swagger UI |
-| `http://localhost:8000/redoc` | ReDoc Documentation |
-| `http://localhost:8000/home.html` | Landing Page |
-| `http://localhost:8000/login.html` | Login Page |
-| `http://localhost:8000/dashboard.html` | Dashboard |
-
-### Environment Variables
-
-```env
-APP_NAME=EduMetric              # App identifier
-DEBUG=True                      # Enable debug mode
-SECRET_KEY=your-secret-key      # JWT secret (change in production!)
-ALGORITHM=HS256                 # JWT algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES=60  # Token validity
-DATABASE_URL=postgresql://...   # Database connection
-```
+| `http://localhost:8000/` | API root (redirects to /docs) |
+| `http://localhost:8000/docs` | Swagger UI (interactive API docs) |
+| `http://localhost:8000/redoc` | ReDoc (alternative API docs) |
+| `http://localhost:8000/home.html` | Landing page |
+| `http://localhost:8000/login.html` | User login |
+| `http://localhost:8000/register.html` | User registration |
+| `http://localhost:8000/dashboard.html` | User dashboard |
 
 ---
 
-- ✅ **Role-Based Access Control** (RBAC) implementation
-- ✅ **JWT authentication** with FastAPI
-- ✅ **Ollama AI integration** for local LLM inference
-- ✅ **PDF text extraction** with pdfplumber
-- ✅ **Text parsing** for structured content
-- ✅ **Database design** with relationships
-- ✅ **Modern frontend** with vanilla JavaScript
-- ✅ **API design** following REST principles
-- ✅ **Error handling** and validation
-- ✅ **Clean architecture** with separation of concerns
-- ✅ **Containerization with Docker** for deployment
-- ✅ **CI/CD automation with GitHub Actions** for testing
-- ✅ **Unit testing with pytest** and FastAPI TestClient
-- ✅ **Test fixtures** for test isolation
-- ✅ **Code coverage** reporting and monitoring
+## 🔮 Future Roadmap
+
+- [ ] **Analytics Dashboard** – Marks distribution, submission trends
+- [ ] **Real-time Notifications** – WebSocket support for grade updates
+- [ ] **Pagination** – Handle large submission lists efficiently
+- [ ] **Multiple AI Models** – Support GPT, Claude, Gemini
+- [ ] **Email Notifications** – Notify students of grades
+- [ ] **Dark Mode** – User interface theme toggle
+- [ ] **Search & Filter** – Advanced assignment search
+- [ ] **Rate Limiting** – Prevent API abuse
+- [ ] **Cloud Deployment** – AWS, Railway, Render templates
+- [ ] **Mobile App** – React Native/Flutter client
 
 ---
 
-## 🔮 Future Improvements
+## 📄 License
 
-- 📊 **Analytics Dashboard** with charts (marks distribution, submission trends)
-- 🔄 **Real-time notifications** (WebSockets for grade updates)
-- 📄 **Pagination** for large submission lists
-- 🐳 **Docker Compose** for multi-container orchestration
-- ☁️ **Cloud Deployment** (Render/Railway/AWS)
-- 📝 **Rich text editor** for submissions
-- 🎨 **Dark mode** toggle
-- 🔍 **Search & filter** for assignments
-- 📧 **Email notifications** for grades
-- 📱 **Mobile app** (React Native/Flutter)
-- 🤖 **Multiple AI models** (GPT, Claude, Gemini support)
-- 📈 **Performance monitoring** with Prometheus
-- 🔒 **Rate limiting** for API endpoints
+This project is licensed under the **MIT License** – See LICENSE file for details.
 
 ---
 
-## 🛠️ Troubleshooting
+## 👨‍💻 About
 
-### Ollama Connection Issues
-```bash
-# Check if Ollama is running
-curl http://localhost:11434/api/tags
+**EduMetric** is an educational project demonstrating:
+- Full-stack web development with FastAPI
+- Asynchronous Python programming
+- Local AI integration (Ollama)
+- Database design and async ORM patterns
+- Testing and CI/CD automation
+- Docker containerization
 
-# Restart Ollama service
-ollama serve
-```
-
-### Database Connection Error
-```bash
-# Check PostgreSQL is running
-# Verify DATABASE_URL in .env
-# Create database manually if needed
-psql -U postgres
-CREATE DATABASE edumetric;
-```
-
-### PDF Extraction Fails
-- Ensure PDF is text-based (not scanned image)
-- Check file size (large PDFs may timeout)
-- Verify pdfplumber is installed correctly
-
-### Tests Not Running
-```bash
-# Activate virtual environment
-source myvenv/Scripts/activate  # Linux/Mac
-myvenv\Scripts\activate         # Windows
-
-# Install test dependencies
-pip install -r requirements.txt
-
-# Run tests with verbose output
-pytest -v
-```
-
-### Docker Build Fails
-- Ensure all dependencies in `requirements.txt` are installable
-- Check that `.dockerignore` doesn't exclude essential files
-- Try clearing Docker cache: `docker build --no-cache -t edumetric:latest .`
-
-### Docker Runtime Errors
-- Verify DATABASE_URL environment variable is set
-- Ensure PostgreSQL is accessible from container
-- Check port 8000 is not in use: `docker run -p 8000:8000 edumetric:latest`
-
-### GitHub Actions Workflow Failing
-- Check test output in Actions tab
-- Ensure `requirements.txt` has all dependencies
-- Verify `.env` variables are not needed for tests
-- Check Python version compatibility (3.13 required)
+**Not intended for production use without proper security hardening, testing, and scaling considerations.**
 
 ---
 
-## 🚢 Deployment
+## ⭐ Support
 
-### Local Development
-```bash
-# Using uvicorn directly
-uvicorn app.main:app --reload --port 8000
-```
-
-### Docker Deployment
-```bash
-# Build and run with Docker
-docker build -t edumetric:latest .
-docker run -p 8000:8000 \
-  -e DATABASE_URL="postgresql://user:password@host:5432/edumetric" \
-  edumetric:latest
-```
-
-### Cloud Deployment Options
-- **Render**: Connect GitHub repo → Deploy on push
-- **Railway**: Similar to Render, easy setup
-- **AWS**: EC2 with Docker, RDS for PostgreSQL
-- **DigitalOcean**: App Platform with GitHub integration
-
-### Pre-Deployment Checklist
-- ✅ All tests pass: `pytest -v`
-- ✅ Docker image builds: `docker build -t edumetric:latest .`
-- ✅ `.env` file never committed to GitHub
-- ✅ `SECRET_KEY` changed in production
-- ✅ Database URL points to production database
-- ✅ Ollama running and accessible
-- ✅ GitHub Actions workflow passes
+If you found this project useful, please consider:
+- ⭐ **Star the repository** on GitHub
+- 🐛 **Report issues** if you find bugs
+- 🤝 **Contribute** improvements via pull requests
+- 📧 **Share feedback** to help improve the project
 
 ---
 
-This project is **for educational purposes** to demonstrate full-stack development with AI integration. Not recommended for production without proper security hardening, testing, and scalability improvements.
-
----
-
-## 👨‍💻 Author
-
-Made with ❤️ by **Shounak**
-
----
-
-## ⭐ If you found this project useful, please ⭐ the repository!
-
----
+**Made with ❤️ by [Shounak](https://github.com/Shounak-Chavan)**
